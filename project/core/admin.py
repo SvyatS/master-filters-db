@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import *
+
+admin.site.register(Thing)
+admin.site.register(Master)
+admin.site.register(Order)
