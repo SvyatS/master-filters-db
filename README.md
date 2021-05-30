@@ -25,8 +25,8 @@ urls for check APIs
 | filters/second/<slug:thing>/ | repairs thing  |
 | filters/third/ | dont have args  |
 | filters/fourth/ | master's age and master's repairs thing |
-| filters/fifth/ | dont work |
-| filters/sixth/| dont work |
+| filters/fifth/ | dont have args |
+| filters/sixth/| <slug:thing>/ | repairs thing  |
 
 
 **Goodluck, DIMAN!**
