@@ -15,6 +15,7 @@ class Master(models.Model):
     birthday_address = models.CharField("Место рождения", max_length=64)
     repairs_thing = models.ForeignKey(Thing, on_delete=models.CASCADE)
     work_price = models.DecimalField("Стоимость ремонта", max_digits=20, decimal_places=1)
+    expirience = models.PositiveIntegerField("Стаж")
 
 
 class Order(models.Model):

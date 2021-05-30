@@ -12,4 +12,6 @@ urlpatterns = [
     path('filters/second/<slug:thing>/', filter_2),
     path('filters/third/', filter_3),
     path('filters/fourth/', filter_4),
+    path('filters/fifth/', filter_5),
+    path('filters/sixth/<slug:thing>/', filter_6),
 ]

@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
 import datetime
+from dateutil.relativedelta import relativedelta
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -36,7 +37,7 @@ def filter_1(request):
 @api_view(['GET'])
 def filter_2(request, thing):
     """мастера до 30 лет, занимающиеся выбранной техникой"""
-    masters = Master.objects.filter(repairs_thing=thing)
+    masters = Master.objects.filter(repairs_thing=thing, birthday__year__gt=(datetime.date.today().year - 30))
     serializer = MasterSerializer(masters, many=True)
     return Response(serializer.data)
 
@@ -82,14 +83,49 @@ def filter_5(request):
     выполнившие заказы на сумму больше,
     чем средняя стоимость заказов,
     выполненных за последние 3 месяца"""
+    orders = Order.objects.filter(order_date__range=[datetime.date.today() - relativedelta(months=3), datetime.date.today()])
+    mid_price = 0
+    for order in orders:
+        mid_price += float(order.price)
 
-    pass
+    mid_price /= orders.count()
+
+    masters =  Master.objects.filter(expirience__gte = 10, expirience__lte = 20)
+    masters_id = {master.id: 0 for master in masters}
+
+    orders = Order.objects.filter(master__in=masters)
+    for order in orders:
+        masters_id[order.master.id] += float(order.price)
+
+    masters_id = {master: masters_id[master] for master in masters_id if masters_id[master] > mid_price}
+    masters = masters.filter(id__in=[id for id in masters_id])
+
+    serializer = MasterSerializer(masters, many=True)
+    return Response(serializer.data)
 
 @api_view(['GET'])
-def filter_6(request):
+def filter_6(request, thing):
     """Мастера, которые занимаются заданной техникой,
     выполнившие заказов на сумму больше,
     чем средняя стоимость заказов,
     выполненных мастерами со стажем от 2 до 5 лет"""
 
-    pass
+    masters = Master.objects.filter(expirience__gte=2, expirience__lte=5)
+    orders = Order.objects.filter(master__in=masters)
+    mid_price = 0
+
+    for order in orders:
+        mid_price += float(order.price)
+
+    mid_price /= orders.count()
+
+    masters = Master.objects.filter(repairs_thing=thing)
+    masters_id = {master.id: 0 for master in masters}
+    orders = Order.objects.filter(master__in=masters)
+    for order in orders:
+        masters_id[order.master.id] += float(order.price)
+    masters_id = {master: masters_id[master] for master in masters_id if masters_id[master] > mid_price}
+    masters = masters.filter(id__in=[id for id in masters_id])
+
+    serializer = MasterSerializer(masters, many=True)
+    return Response(serializer.data)
